@@ -18,18 +18,28 @@ export function processReadingViewTables(
   const tables = el.querySelectorAll('table');
 
   tables.forEach((table) => {
-    const info = ctx.getSectionInfo(table) ?? ctx.getSectionInfo(el);
+    // Resolved fresh on every access so a click never relies on the table's
+    // line numbers captured at render time (they can drift between tables).
+    const resolve = () => ctx.getSectionInfo(table) ?? ctx.getSectionInfo(el);
+
+    const info = resolve();
     if (!info) return;
 
     const lines = info.text.split('\n');
     const flags = findMarkerForTable(lines, info.lineStart);
     if (!flags) return;
 
-    const headerLine = findHeaderLine(lines, info.lineStart);
     const source: TableSource = {
       flags,
-      writeCell: (bodyRow, col, oldToken, newToken) =>
-        writeCell(app, ctx.sourcePath, headerLine, bodyRow, col, oldToken, newToken),
+      writeCell: (bodyRow, col, oldToken, newToken) => {
+        const fresh = resolve();
+        if (!fresh) return Promise.resolve();
+
+        const freshLines = fresh.text.split('\n');
+        const headerLine = findHeaderLine(freshLines, fresh.lineStart);
+        const lineIndex = bodyRowSourceLine(headerLine, bodyRow);
+        return writeCell(app, ctx.sourcePath, lineIndex, col, oldToken, newToken);
+      },
     };
 
     enhanceTable(table, source, settings);
@@ -39,8 +49,7 @@ export function processReadingViewTables(
 async function writeCell(
   app: App,
   sourcePath: string,
-  headerLine: number,
-  bodyRow: number,
+  lineIndex: number,
   col: number,
   oldToken: string,
   newToken: string
@@ -48,7 +57,6 @@ async function writeCell(
   const file = app.vault.getAbstractFileByPath(sourcePath);
   if (!(file instanceof TFile)) return;
 
-  const lineIndex = bodyRowSourceLine(headerLine, bodyRow);
   await app.vault.process(file, (data) => {
     const lines = data.split('\n');
     const line = lines[lineIndex];

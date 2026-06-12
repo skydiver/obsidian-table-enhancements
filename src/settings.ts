@@ -1,6 +1,6 @@
 import { PluginSettingTab, Setting } from 'obsidian';
 import type TableEnhancementsPlugin from './main';
-import { DEFAULT_SETTINGS, type EmojiTrio } from './types';
+import { DEFAULT_SETTINGS, type EmojiSequence } from './types';
 
 export class TableEnhancementsSettingTab extends PluginSettingTab {
   private plugin: TableEnhancementsPlugin;
@@ -14,25 +14,30 @@ export class TableEnhancementsSettingTab extends PluginSettingTab {
     this.containerEl.empty();
 
     new Setting(this.containerEl)
-      .setName('Tristate emojis')
-      .setDesc('Three emojis cycled by the tristate-emoji control, separated by spaces.')
+      .setName('Default emoji cycle')
+      .setDesc(
+        'Emojis cycled by a bare `emoji` marker, in order, separated by spaces. ' +
+          'A table can override this inline with `emoji:a,b,c`.'
+      )
       .addText((text) =>
         text
-          .setPlaceholder(DEFAULT_SETTINGS.tristateEmojis.join(' '))
-          .setValue(this.plugin.settings.tristateEmojis.join(' '))
+          .setPlaceholder(DEFAULT_SETTINGS.defaultEmojis.join(' '))
+          .setValue(this.plugin.settings.defaultEmojis.join(' '))
           .onChange(async (value) => {
-            const trio = parseTrio(value);
-            if (!trio) return;
-            this.plugin.settings.tristateEmojis = trio;
+            const sequence = parseEmojiSequence(value);
+            if (!sequence) return;
+            this.plugin.settings.defaultEmojis = sequence;
             await this.plugin.saveSettings();
           })
       );
   }
 }
 
-/** Parse exactly three space-separated emojis, or `null` when malformed. */
-function parseTrio(value: string): EmojiTrio | null {
-  const parts = value.trim().split(/\s+/).filter(Boolean);
-  if (parts.length !== 3) return null;
-  return [parts[0], parts[1], parts[2]];
+/** Parse a space- or comma-separated emoji list (needs at least two), else `null`. */
+function parseEmojiSequence(value: string): EmojiSequence | null {
+  const parts = value
+    .trim()
+    .split(/[\s,]+/)
+    .filter(Boolean);
+  return parts.length >= 2 ? parts : null;
 }

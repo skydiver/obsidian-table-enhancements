@@ -1,8 +1,11 @@
 /**
- * Which checkbox control a cell renders. The cell content is self-describing,
- * so the mode is derived from the token, gated by the table's enabled flags.
+ * Which control a cell renders. The cell content is self-describing, so the
+ * mode is derived from the token, gated by the table's enabled flags.
  */
-export type CheckboxMode = 'checkbox' | 'tristate-box' | 'tristate-emoji';
+export type CheckboxMode = 'checkbox' | 'tristate-box' | 'emoji';
+
+/** An ordered list of emojis cycled by the `emoji` control. */
+export type EmojiSequence = string[];
 
 /**
  * The set of enhancements enabled for a single table, parsed from its marker
@@ -14,18 +17,20 @@ export interface EnhancementFlags {
   checkbox: boolean;
   /** 3-state box: `[ ]` / `[/]` / `[x]`. */
   tristateBox: boolean;
-  /** 3-state emoji cycle, using the configured emoji trio. */
-  tristateEmoji: boolean;
+  /** N-state emoji cycle. */
+  emoji: boolean;
+  /**
+   * Per-table emoji sequence from `emoji:a,b,c`, or `null` when the marker is a
+   * bare `emoji` (falls back to the settings default).
+   */
+  emojiSequence: EmojiSequence | null;
 }
 
-/** A configured trio of emojis for the `tristate-emoji` control. */
-export type EmojiTrio = [string, string, string];
-
 export interface TableEnhancementsSettings {
-  /** Emojis cycled by the `tristate-emoji` control, in order. */
-  tristateEmojis: EmojiTrio;
+  /** Default emoji cycle used by a bare `emoji` marker, in order. */
+  defaultEmojis: EmojiSequence;
 }
 
 export const DEFAULT_SETTINGS: TableEnhancementsSettings = {
-  tristateEmojis: ['⬜', '🟨', '✅'],
+  defaultEmojis: ['⬜', '🟨', '✅'],
 };

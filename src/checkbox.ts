@@ -1,4 +1,4 @@
-import type { CheckboxMode, EmojiTrio, EnhancementFlags } from './types';
+import type { CheckboxMode, EmojiSequence, EnhancementFlags } from './types';
 
 /** A leading bracket token: `[ ]`, `[x]`, `[X]`, or `[/]`. */
 const BRACKET_RE = /^(\[[ xX/]\])(.*)$/;
@@ -34,11 +34,13 @@ export function tristateBoxState(token: string): 'empty' | 'dash' | 'check' {
  * `tristate-box` takes precedence over the 2-state `checkbox` for bracket
  * tokens when both are enabled (they are documented as mutually exclusive).
  * Emoji tokens occupy their own token space and coexist with a bracket mode.
+ *
+ * `emojis` is the table's resolved emoji sequence (inline list or default).
  */
 export function matchControl(
   cellText: string,
   flags: EnhancementFlags,
-  emojis: EmojiTrio
+  emojis: EmojiSequence
 ): ControlMatch | null {
   const trimmed = cellText.replace(/^\s+/, '');
 
@@ -51,10 +53,10 @@ export function matchControl(
     };
   }
 
-  if (flags.tristateEmoji) {
+  if (flags.emoji) {
     const hit = emojis.find((emoji) => trimmed.startsWith(emoji));
     if (hit) {
-      return { mode: 'tristate-emoji', token: hit, label: trimmed.slice(hit.length) };
+      return { mode: 'emoji', token: hit, label: trimmed.slice(hit.length) };
     }
   }
 
@@ -62,7 +64,7 @@ export function matchControl(
 }
 
 /** Compute the token a control should advance to when activated. */
-export function nextToken(match: ControlMatch, emojis: EmojiTrio): string {
+export function nextToken(match: ControlMatch, emojis: EmojiSequence): string {
   switch (match.mode) {
     case 'checkbox':
       return isChecked(match.token) ? '[ ]' : '[x]';
@@ -72,7 +74,7 @@ export function nextToken(match: ControlMatch, emojis: EmojiTrio): string {
       );
       return TRISTATE_BOX_CYCLE[(index + 1) % TRISTATE_BOX_CYCLE.length];
     }
-    case 'tristate-emoji': {
+    case 'emoji': {
       const index = emojis.indexOf(match.token);
       return emojis[(index + 1) % emojis.length];
     }

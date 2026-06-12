@@ -40,13 +40,16 @@ export function enhanceTable(
   const body = table.tBodies[0];
   if (!body) return;
 
+  // Inline `emoji:a,b,c` sequence wins; otherwise fall back to the default.
+  const emojis = flags.emojiSequence ?? settings.defaultEmojis;
+
   Array.from(body.rows).forEach((row, rowIndex) => {
     Array.from(row.cells).forEach((cell, colIndex) => {
-      const match = matchControl(cell.textContent ?? '', flags, settings.tristateEmojis);
+      const match = matchControl(cell.textContent ?? '', flags, emojis);
       if (!match) return;
 
       renderControl(cell, match, () => {
-        const next = nextToken(match, settings.tristateEmojis);
+        const next = nextToken(match, emojis);
         void source.writeCell(rowIndex, colIndex, match.token, next);
       });
     });
@@ -79,7 +82,7 @@ function renderControl(
 
 function buildControl(match: ControlMatch, onActivate: () => void): HTMLElement {
   // Emoji control is a clickable text glyph.
-  if (match.mode === 'tristate-emoji') {
+  if (match.mode === 'emoji') {
     const span = document.createElement('span');
     span.classList.add('te-control', 'te-tristate-emoji');
     span.setAttribute('role', 'button');

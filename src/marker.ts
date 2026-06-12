@@ -6,7 +6,15 @@ import type { EnhancementFlags } from './types';
  */
 const MARKER_RE = /^%%\s*table-enhance\b([^%]*)%%$/;
 
-const KNOWN_TOKENS = ['hover', 'checkbox', 'tristate-box', 'tristate-emoji'] as const;
+const EMOJI_PREFIX = 'emoji:';
+
+/** Split an inline emoji list (`a,b,c`) into individual emojis. */
+function parseEmojiSequence(value: string): string[] {
+  return value
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
 
 /**
  * Parse a single source line into enhancement flags.
@@ -20,20 +28,44 @@ export function parseMarker(line: string | null | undefined): EnhancementFlags |
   const match = line.trim().match(MARKER_RE);
   if (!match) return null;
 
-  const tokens = new Set(match[1].trim().split(/\s+/).filter(Boolean));
-  if (!KNOWN_TOKENS.some((token) => tokens.has(token))) return null;
+  const tokens = match[1].trim().split(/\s+/).filter(Boolean);
 
-  return {
-    hover: tokens.has('hover'),
-    checkbox: tokens.has('checkbox'),
-    tristateBox: tokens.has('tristate-box'),
-    tristateEmoji: tokens.has('tristate-emoji'),
+  const flags: EnhancementFlags = {
+    hover: false,
+    checkbox: false,
+    tristateBox: false,
+    emoji: false,
+    emojiSequence: null,
   };
+  let known = false;
+
+  for (const token of tokens) {
+    if (token === 'hover') {
+      flags.hover = true;
+      known = true;
+    } else if (token === 'checkbox') {
+      flags.checkbox = true;
+      known = true;
+    } else if (token === 'tristate-box') {
+      flags.tristateBox = true;
+      known = true;
+    } else if (token === 'emoji') {
+      flags.emoji = true;
+      known = true;
+    } else if (token.startsWith(EMOJI_PREFIX)) {
+      flags.emoji = true;
+      known = true;
+      const sequence = parseEmojiSequence(token.slice(EMOJI_PREFIX.length));
+      flags.emojiSequence = sequence.length > 0 ? sequence : null;
+    }
+  }
+
+  return known ? flags : null;
 }
 
 /** True when at least one checkbox-style enhancement is enabled. */
 export function hasCheckboxEnhancement(flags: EnhancementFlags): boolean {
-  return flags.checkbox || flags.tristateBox || flags.tristateEmoji;
+  return flags.checkbox || flags.tristateBox || flags.emoji;
 }
 
 /**

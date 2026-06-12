@@ -1,0 +1,10 @@
+{
+  "id": "table-enhancements",
+  "name": "Table Enhancements",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "Per-table enhancements: hover row highlight and clickable checkboxes, opt-in via a marker comment.",
+  "author": "Martín M.",
+  "authorUrl": "https://github.com/skydiver",
+  "isDesktopOnly": false
+}

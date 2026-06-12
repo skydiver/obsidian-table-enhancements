@@ -1,0 +1,66 @@
+/* Hover row highlight — target cells so it paints over theme zebra-striping */
+table.te-hover tbody tr:hover > td,
+table.te-hover tbody tr:hover > th {
+  background-color: var(--background-modifier-hover);
+}
+
+/* Shared interactive control affordances */
+.te-control {
+  cursor: pointer;
+}
+
+.te-control:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.te-checkbox {
+  vertical-align: middle;
+}
+
+/* Tristate emoji */
+.te-tristate-emoji {
+  user-select: none;
+}
+
+/* Tristate box: empty / dash / check */
+.te-tristate-box {
+  display: inline-block;
+  position: relative;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  vertical-align: middle;
+  border: 1px solid var(--text-muted);
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+.te-tristate-box[data-state="dash"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.6em;
+  height: 2px;
+  background-color: var(--text-normal);
+  transform: translate(-50%, -50%);
+}
+
+.te-tristate-box[data-state="check"] {
+  background-color: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+}
+
+.te-tristate-box[data-state="check"]::after {
+  content: "";
+  position: absolute;
+  left: 32%;
+  top: 14%;
+  width: 0.3em;
+  height: 0.6em;
+  border: solid var(--text-on-accent);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}

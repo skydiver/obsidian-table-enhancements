@@ -1,22 +1,26 @@
 # Table Enhancements
 
-Opt-in enhancements for Obsidian markdown tables. Enable features **per table**
-by adding a marker comment on the line directly above it — tables without a
-marker are left untouched.
+An Obsidian plugin that adds opt-in, per-table enhancements to markdown tables —
+hover row highlighting and clickable checkboxes — enabled with a marker comment
+on the line above each table. Tables without a marker are left untouched.
 
-## Marker
+## Usage
+
+Add a marker comment on the line directly above a table, with a blank line
+between the marker and the table. The marker names which features apply:
 
 ```text
 %% table-enhance hover checkbox %%
+
 | Task        | Done |
 | ----------- | ---- |
 | Ship plugin | [ ]  |
 | Write docs  | [x]  |
 ```
 
-The marker names which features apply to the table that follows.
+Clicking a control rewrites the token in the markdown source.
 
-## Features
+### Features
 
 | Token          | Effect                             | Cell syntax           |
 | -------------- | ---------------------------------- | --------------------- |
@@ -24,8 +28,6 @@ The marker names which features apply to the table that follows.
 | `checkbox`     | 2-state clickable checkbox         | `[ ]` / `[x]`         |
 | `tristate-box` | 3-state box, cycles on click       | `[ ]` / `[/]` / `[x]` |
 | `emoji`        | N-state emoji, cycles on click     | one of the emoji set  |
-
-Clicking a control rewrites the token in the markdown source.
 
 ### Emoji cycles (any number of states)
 
@@ -58,6 +60,25 @@ Example with four states:
 - Checkbox cells should be a token optionally followed by plain text
   (e.g. `[ ] Buy milk`).
 
+## Requirements
+
+- Obsidian v1.4.0 or later
+
+## Installation
+
+### From Community Plugins
+
+1. Open Settings → Community plugins → Browse
+2. Search for "Table Enhancements"
+3. Click Install, then Enable
+
+### Manual
+
+1. Download `main.js`, `manifest.json`, and `styles.css` from the latest release
+2. Create a folder `.obsidian/plugins/table-enhancements/` in your vault
+3. Copy the three files into that folder
+4. Enable the plugin in Settings → Community plugins
+
 ## Status
 
 Reading view is supported. Live Preview support is planned.
@@ -66,9 +87,16 @@ Reading view is supported. Live Preview support is planned.
 
 ```bash
 pnpm install
-pnpm dev     # watch build
-pnpm build   # type-check + production build
-pnpm lint    # biome
+pnpm run dev      # watch mode
+pnpm run build    # production build
+pnpm run lint     # check with biome
+pnpm run lint:fix # auto-fix
+```
+
+To test locally, symlink the project folder into your vault:
+
+```bash
+ln -s /path/to/obsidian-table-enhancements /path/to/vault/.obsidian/plugins/table-enhancements
 ```
 
 ## License

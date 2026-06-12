@@ -19,48 +19,20 @@ table.te-hover tbody tr:hover > th {
   vertical-align: middle;
 }
 
+/* Tristate "dash" state. Themes style :checked but rarely :indeterminate, so we
+   render it ourselves as an accent-filled box with a dash bar (drawn via a
+   gradient so it works whether or not the theme uses pseudo-elements), matching
+   the checked look while staying visually distinct from empty. */
+.te-checkbox:indeterminate {
+  background-color: var(--interactive-accent) !important;
+  border-color: var(--interactive-accent) !important;
+  background-image: linear-gradient(var(--text-on-accent), var(--text-on-accent)) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 56% 2px !important;
+}
+
 /* Tristate emoji */
 .te-tristate-emoji {
   user-select: none;
-}
-
-/* Tristate box: empty / dash / check */
-.te-tristate-box {
-  display: inline-block;
-  position: relative;
-  width: 1em;
-  height: 1em;
-  line-height: 1;
-  vertical-align: middle;
-  border: 1px solid var(--text-muted);
-  border-radius: 3px;
-  box-sizing: border-box;
-}
-
-.te-tristate-box[data-state="dash"]::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0.6em;
-  height: 2px;
-  background-color: var(--text-normal);
-  transform: translate(-50%, -50%);
-}
-
-.te-tristate-box[data-state="check"] {
-  background-color: var(--interactive-accent);
-  border-color: var(--interactive-accent);
-}
-
-.te-tristate-box[data-state="check"]::after {
-  content: "";
-  position: absolute;
-  left: 32%;
-  top: 14%;
-  width: 0.3em;
-  height: 0.6em;
-  border: solid var(--text-on-accent);
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
 }

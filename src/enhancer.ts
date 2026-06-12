@@ -78,41 +78,47 @@ function renderControl(
 }
 
 function buildControl(match: ControlMatch, onActivate: () => void): HTMLElement {
-  if (match.mode === 'checkbox') {
-    const input = document.createElement('input');
-    input.type = 'checkbox';
-    input.checked = isChecked(match.token);
-    input.classList.add('te-control', 'te-checkbox');
-    input.addEventListener('click', (event) => {
+  // Emoji control is a clickable text glyph.
+  if (match.mode === 'tristate-emoji') {
+    const span = document.createElement('span');
+    span.classList.add('te-control', 'te-tristate-emoji');
+    span.setAttribute('role', 'button');
+    span.tabIndex = 0;
+    span.textContent = match.token;
+
+    const activate = (event: Event) => {
+      event.preventDefault();
       event.stopPropagation();
       onActivate();
+    };
+    span.addEventListener('click', activate);
+    span.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') activate(event);
     });
-    return input;
+    return span;
   }
 
-  const span = document.createElement('span');
-  span.classList.add('te-control');
-  span.setAttribute('role', 'button');
-  span.tabIndex = 0;
+  // Both 2-state and tristate-box use a native checkbox so they look identical;
+  // the tristate "dash" state maps to the checkbox's indeterminate state.
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.classList.add('te-control', 'te-checkbox');
 
   if (match.mode === 'tristate-box') {
-    span.classList.add('te-tristate-box');
-    span.dataset.state = tristateBoxState(match.token);
+    const state = tristateBoxState(match.token);
+    input.checked = state === 'check';
+    input.indeterminate = state === 'dash';
   } else {
-    span.classList.add('te-tristate-emoji');
-    span.textContent = match.token;
+    input.checked = isChecked(match.token);
   }
 
-  const activate = (event: Event) => {
+  input.addEventListener('click', (event) => {
+    // State is driven by the source rewrite + re-render, not the native toggle.
     event.preventDefault();
     event.stopPropagation();
     onActivate();
-  };
-  span.addEventListener('click', activate);
-  span.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') activate(event);
   });
-  return span;
+  return input;
 }
 
 function firstTextNode(root: Node): Text | null {

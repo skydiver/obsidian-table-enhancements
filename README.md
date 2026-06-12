@@ -32,9 +32,10 @@ Clicking a control rewrites the token in the markdown source.
 `emoji` cycles a cell through an ordered emoji set, so you can have as many
 states as you like:
 
-- `%% table-enhance emoji %%` — uses the default set from settings (`⬜ 🟨 ✅`).
-- `%% table-enhance emoji:🔴,🟡,🟢 %%` — a custom per-table set (comma-separated;
-  commas keep compound emojis intact).
+- `%% table-enhance emoji %%` — uses the default set from settings
+  (`🔴 🟡 🟢`, configurable).
+- `%% table-enhance emoji:⬜,🟨,✅ %%` — a custom per-table set that overrides the
+  default (comma-separated; commas keep compound emojis intact).
 
 Example with four states:
 

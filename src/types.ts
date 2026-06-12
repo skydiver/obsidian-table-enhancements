@@ -32,5 +32,5 @@ export interface TableEnhancementsSettings {
 }
 
 export const DEFAULT_SETTINGS: TableEnhancementsSettings = {
-  defaultEmojis: ['⬜', '🟨', '✅'],
+  defaultEmojis: ['🔴', '🟡', '🟢'],
 };

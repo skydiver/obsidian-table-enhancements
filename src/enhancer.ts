@@ -84,7 +84,7 @@ function buildControl(match: ControlMatch, onActivate: () => void): HTMLElement 
   // Emoji control is a clickable text glyph.
   if (match.mode === 'emoji') {
     const span = document.createElement('span');
-    span.classList.add('te-control', 'te-tristate-emoji');
+    span.classList.add('te-control', 'te-emoji');
     span.setAttribute('role', 'button');
     span.tabIndex = 0;
     span.textContent = match.token;

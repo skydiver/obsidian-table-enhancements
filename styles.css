@@ -32,7 +32,7 @@ table.te-hover tbody tr:hover > th {
   background-size: 56% 2px !important;
 }
 
-/* Tristate emoji */
-.te-tristate-emoji {
+/* Emoji control */
+.te-emoji {
   user-select: none;
 }

@@ -30,6 +30,22 @@ export class TableEnhancementsSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(this.containerEl)
+      .setName('Live Preview support (experimental)')
+      .setDesc(
+        'Also enhance tables while editing in Live Preview. This relies on ' +
+          "Obsidian's internal table rendering and may break with future Obsidian " +
+          'updates. Reading view works regardless of this setting.'
+      )
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.livePreview).onChange(async (value) => {
+          this.plugin.settings.livePreview = value;
+          await this.plugin.saveSettings();
+          // Add/remove the editor extension so the change applies without a restart.
+          this.plugin.refreshEditorExtensions();
+        })
+      );
   }
 }
 

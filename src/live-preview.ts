@@ -35,6 +35,20 @@ export function livePreviewEnhancements(getSettings: () => TableEnhancementsSett
 
       destroy(): void {
         this.observer.disconnect();
+        // Reached when the user turns the feature off (the extension is removed)
+        // or the plugin unloads — restore the raw tokens we replaced.
+        this.revertAll();
+      }
+
+      /** Replace every control with its original token and drop the hover class. */
+      private revertAll(): void {
+        const root = this.view.contentDOM;
+        root.querySelectorAll('table.te-hover').forEach((table) => {
+          table.classList.remove('te-hover');
+        });
+        root.querySelectorAll<HTMLElement>('.te-control').forEach((control) => {
+          control.replaceWith(root.ownerDocument.createTextNode(control.dataset.teToken ?? ''));
+        });
       }
 
       /** Coalesce bursts of updates into a single pass on the next frame. */

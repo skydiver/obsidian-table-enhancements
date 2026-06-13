@@ -102,6 +102,7 @@ function buildControl(match: ControlMatch, onActivate: () => void): HTMLElement 
     span.setAttribute('role', 'button');
     span.tabIndex = 0;
     span.textContent = match.token;
+    span.dataset.teToken = match.token; // lets the LP adapter restore raw text
 
     const activate = (event: Event) => {
       event.preventDefault();
@@ -122,6 +123,7 @@ function buildControl(match: ControlMatch, onActivate: () => void): HTMLElement 
   const input = document.createElement('input');
   input.type = 'checkbox';
   input.classList.add('te-control', 'te-checkbox');
+  input.dataset.teToken = match.token; // lets the LP adapter restore raw text
 
   if (match.mode === 'tristate-box') {
     const state = tristateBoxState(match.token);

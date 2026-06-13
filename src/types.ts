@@ -29,8 +29,14 @@ export interface EnhancementFlags {
 export interface TableEnhancementsSettings {
   /** Default emoji cycle used by a bare `emoji` marker, in order. */
   defaultEmojis: EmojiSequence;
+  /**
+   * Experimental: enhance tables in Live Preview too. Off by default because it
+   * depends on Obsidian's internal table rendering. Reading view is unaffected.
+   */
+  livePreview: boolean;
 }
 
 export const DEFAULT_SETTINGS: TableEnhancementsSettings = {
   defaultEmojis: ['🔴', '🟡', '🟢'],
+  livePreview: false,
 };

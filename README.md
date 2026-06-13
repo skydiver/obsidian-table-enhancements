@@ -2,8 +2,9 @@
 
 An Obsidian plugin that adds opt-in, per-table enhancements to markdown tables —
 hover row highlighting and clickable checkboxes — enabled with a marker comment
-on the line above each table. Tables without a marker are left untouched. Works
-in both Reading view and Live Preview.
+on the line above each table. Tables without a marker are left untouched.
+Reading view works out of the box; Live Preview support is experimental and
+opt-in (enable it in settings).
 
 ## Usage
 
@@ -60,6 +61,13 @@ Example with four states:
   (the box's middle state uses the checkbox's `indeterminate` state).
 - Checkbox cells should be a token optionally followed by plain text
   (e.g. `[ ] Buy milk`).
+
+## Settings
+
+| Setting                             | Default    | Description                                                                                                                                                                 |
+| ----------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Default emoji cycle                 | `🔴 🟡 🟢` | Emojis cycled by a bare `emoji` marker, in order. A table can override this inline with `emoji:a,b,c`.                                                                      |
+| Live Preview support (experimental) | Off        | Also enhance tables while editing in Live Preview. Relies on Obsidian's internal table rendering and may break with future Obsidian updates; Reading view works regardless. |
 
 ## Requirements
 

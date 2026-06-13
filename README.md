@@ -2,7 +2,8 @@
 
 An Obsidian plugin that adds opt-in, per-table enhancements to markdown tables —
 hover row highlighting and clickable checkboxes — enabled with a marker comment
-on the line above each table. Tables without a marker are left untouched.
+on the line above each table. Tables without a marker are left untouched. Works
+in both Reading view and Live Preview.
 
 ## Usage
 
@@ -78,10 +79,6 @@ Example with four states:
 2. Create a folder `.obsidian/plugins/table-enhancements/` in your vault
 3. Copy the three files into that folder
 4. Enable the plugin in Settings → Community plugins
-
-## Status
-
-Reading view is supported. Live Preview support is planned.
 
 ## Development
 

@@ -1,6 +1,6 @@
 {
   "name": "obsidian-table-enhancements",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Per-table enhancements for Obsidian: hover row highlight and clickable checkboxes, opt-in via a marker comment.",
   "main": "main.js",
   "author": "Martín M.",

@@ -1,4 +1,5 @@
 import { Plugin } from 'obsidian';
+import { livePreviewEnhancements } from './live-preview';
 import { processReadingViewTables } from './reading-view';
 import { TableEnhancementsSettingTab } from './settings';
 import { DEFAULT_SETTINGS, type TableEnhancementsSettings } from './types';
@@ -13,6 +14,8 @@ export default class TableEnhancementsPlugin extends Plugin {
     this.registerMarkdownPostProcessor((el, ctx) => {
       processReadingViewTables(this.app, this.settings, el, ctx);
     });
+
+    this.registerEditorExtension(livePreviewEnhancements(() => this.settings));
   }
 
   async loadSettings() {

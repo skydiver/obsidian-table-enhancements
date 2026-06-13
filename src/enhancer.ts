@@ -18,20 +18,20 @@ export interface TableSource {
   writeCell(bodyRow: number, col: number, oldToken: string, newToken: string): void | Promise<void>;
 }
 
-const ENHANCED_ATTR = 'teEnhanced';
-
 /**
  * Apply the enabled enhancements to a rendered `<table>`.
- * Idempotent: a table is processed at most once per DOM instance.
+ *
+ * Safe to call repeatedly on the same table: a cell is enhanced only when it
+ * still holds a raw control token and has no control yet. This matters in Live
+ * Preview, where Obsidian reuses the same `<table>` node and re-renders just the
+ * edited cell back to raw text — re-running re-enhances that cell while leaving
+ * the others untouched.
  */
 export function enhanceTable(
   table: HTMLTableElement,
   source: TableSource,
   settings: TableEnhancementsSettings
 ): void {
-  if (table.dataset[ENHANCED_ATTR] === 'true') return;
-  table.dataset[ENHANCED_ATTR] = 'true';
-
   const { flags } = source;
   if (flags.hover) table.classList.add('te-hover');
 
@@ -45,6 +45,10 @@ export function enhanceTable(
 
   Array.from(body.rows).forEach((row, rowIndex) => {
     Array.from(row.cells).forEach((cell, colIndex) => {
+      // Already enhanced this cell — skip (cheap idempotency that still lets a
+      // cell Obsidian reverted to raw text be re-enhanced on the next pass).
+      if (cell.querySelector('.te-control')) return;
+
       const match = matchControl(cell.textContent ?? '', flags, emojis);
       if (!match) return;
 
@@ -81,6 +85,16 @@ function renderControl(
 }
 
 function buildControl(match: ControlMatch, onActivate: () => void): HTMLElement {
+  // Stop the press from reaching CodeMirror: otherwise it moves the Live Preview
+  // caret into the clicked cell, and the editor then re-renders that cell as raw
+  // source (the checkbox reverts to `[ ]` text). preventDefault alone only blocks
+  // focus, so we must also stopPropagation, and on pointerdown (which fires
+  // before mousedown). Harmless in reading view, where there is no caret.
+  const suppressPress = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   // Emoji control is a clickable text glyph.
   if (match.mode === 'emoji') {
     const span = document.createElement('span');
@@ -94,6 +108,8 @@ function buildControl(match: ControlMatch, onActivate: () => void): HTMLElement 
       event.stopPropagation();
       onActivate();
     };
+    span.addEventListener('pointerdown', suppressPress);
+    span.addEventListener('mousedown', suppressPress);
     span.addEventListener('click', activate);
     span.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') activate(event);
@@ -115,6 +131,8 @@ function buildControl(match: ControlMatch, onActivate: () => void): HTMLElement 
     input.checked = isChecked(match.token);
   }
 
+  input.addEventListener('pointerdown', suppressPress);
+  input.addEventListener('mousedown', suppressPress);
   input.addEventListener('click', (event) => {
     // State is driven by the source rewrite + re-render, not the native toggle.
     event.preventDefault();

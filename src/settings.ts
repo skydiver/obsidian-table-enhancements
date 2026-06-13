@@ -1,4 +1,4 @@
-import { PluginSettingTab, Setting } from 'obsidian';
+import { MarkdownRenderer, PluginSettingTab, Setting } from 'obsidian';
 import type TableEnhancementsPlugin from './main';
 import { DEFAULT_SETTINGS, type EmojiSequence } from './types';
 
@@ -46,6 +46,54 @@ export class TableEnhancementsSettingTab extends PluginSettingTab {
           this.plugin.refreshEditorExtensions();
         })
       );
+
+    this.renderHelp(this.containerEl);
+  }
+
+  /** A short "how it works" reference: the marker, its tokens, and cell syntax. */
+  private renderHelp(container: HTMLElement): void {
+    container.createEl('hr', { cls: 'te-help-divider' });
+
+    new Setting(container).setName('How it works').setHeading();
+
+    const box = container.createDiv({ cls: 'te-help' });
+
+    box.createEl('p', {
+      text:
+        'Enhancements are opt-in per table. Add a marker comment on the line ' +
+        'directly above a table, with a blank line between the marker and the ' +
+        'table. Tables without a marker are left untouched.',
+    });
+
+    box.createEl('pre').createEl('code', { text: '%% table-enhance hover checkbox %%' });
+
+    // Render the example as a real table so it reads as a table, not ASCII.
+    const example = box.createDiv({ cls: 'te-help-table markdown-rendered' });
+    void MarkdownRenderer.render(
+      this.plugin.app,
+      '| Task | Done |\n| ---- | ---- |\n| Ship plugin | [ ] |\n| Write docs | [x] |',
+      example,
+      '',
+      this.plugin
+    );
+
+    box.createEl('p', { text: 'The marker lists which features apply:' });
+
+    const list = box.createEl('ul');
+    const addToken = (token: string, description: string) => {
+      const item = list.createEl('li');
+      item.createEl('code', { text: token });
+      item.appendText(` — ${description}`);
+    };
+    addToken('hover', 'highlight the row under the cursor');
+    addToken('checkbox', '2-state checkbox: [ ] / [x]');
+    addToken('tristate-box', '3-state box: [ ] / [/] / [x]');
+    addToken('emoji', 'cycle a cell through the default emoji set');
+    addToken('emoji:a,b,c', 'cycle a custom, comma-separated emoji set for that table');
+
+    box.createEl('p', {
+      text: 'Click a control to cycle it; the new value is written back to the note.',
+    });
   }
 }
 
